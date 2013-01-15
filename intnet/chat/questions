@@ -1,0 +1,17 @@
+Trådar: För n ansluta klienter:
+	Klient: 2 (en för input och en för att lyssna på socketen)
+	Server: 1 + n (bastråd för att ansluta nya, och en per klient)
+
+SYN: Sätter upp en tcp anslutning (syncroniserar sekvensnummer)
+SEQ: Sekvensnummer för paketet
+ACK: Bekräftar att paket är mottaget
+Del av tcp
+
+Länklager:
+	Kommunication mellan nätverkskorten på en simpel nivå, hanterar frames etc. Kommunikationen sker mellan mac-adresser.
+Internetlager:
+	IP-protokollet används för kommunikation här, en header talar om vart paketet ska
+Transportlager:
+	TCP hanterar anslutningar,retransmits etc
+Applikationslagret:
+	Mitt program
