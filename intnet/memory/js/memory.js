@@ -1,13 +1,13 @@
 var players = [
 	{
-	name: "Player1",
-	score: 0,
-	old_score: 0,
+		name: "Player1",
+		score: 0,
+		old_score: 0,
 	},
 	{
-	name: "Player2",
-	score: 0,
-	old_score: 0,
+		name: "Player2",
+		score: 0,
+		old_score: 0,
 	}
 ]
 
@@ -19,7 +19,7 @@ var size = [0, 0];
 var sets = {
 	"landscapes": {
 		path: "images/landscapes/",
-		size: 17
+		size: 18
 	}
 }
 
@@ -41,9 +41,17 @@ $(function() {
 		players[1].score = 0;
 		players[1].old_score = 0;
 		$("#newgame").slideUp();
-		load_set(sets.landscapes, [4, 4]);
+		var board_size = $("#board_size option:selected")
+		load_set(sets.landscapes, [board_size.data("width"), board_size.data("height")]);
 		$("#game").slideDown();
 		return false;
+	})
+
+	$("#restart").click(function() {
+		$("#game").slideUp()
+		$("#win").fadeOut()
+		$("#newgame").slideDown()
+		return false
 	})
 })
 
@@ -82,6 +90,12 @@ function load_board() {
 	var possible_cards = [];
 	var possible_pos = [];
 	var positions = size[0]*size[1];
+
+	if(positions/2 > set.size) {
+		alert("Too large board for this picture set!");
+		return;
+	}
+
 	board = Array(positions);
 
 	for(i=0;i<set.size; ++i) {
@@ -223,8 +237,10 @@ function check_open() {
 		c1.found = true
 		c2.found = true
 		open_cards.length = 0
-		current_player = (current_player + 1) % 2;
-		update_turn()
+		--remaining_cards;
+		if(remaining_cards <= 0) {
+			setTimeout(win, 100)
+		}
 	} else {
 		setTimeout(restore_and_next, 800)
 	}
@@ -234,4 +250,15 @@ function restore_and_next() {
 	restore_open()
 	current_player = (current_player + 1) % 2;
 	update_turn()
+}
+
+function win() {
+	var winner = "It's a draw!";
+	if(players[0].score > players[1].score) {
+		winner = players[0].name + " wins!"
+	} else if(players[1].score > players[0].score) {
+		winner = players[1].name + " wins!"
+	}
+	$("#winner").html(winner)
+	$("#win").fadeIn(1000);
 }

@@ -13,6 +13,14 @@
 			<h2>New game</h2>
 			<form>
 				<p>
+				<label for="board_size">Board size: </label>
+				<select id="board_size">
+					<option data-width="4" data-height="4">4 x 4</option>
+					<option data-width="5" data-height="4">5 x 4</option>
+					<option data-width="6" data-height="4">6 x 4</option>
+					<option data-width="6" data-height="6">6 x 6</option>
+				</select>		
+				<br/>
 				<label for="p1">Player 1 name: </label><input type="text" id="p1" value="Player 1"/><br/>
 				<label for="p2">Player 2 name: </label><input type="text" id="p2" value="Player 2"/><br/>
 				<input type ="submit" value="Start game" id="start"/>
@@ -20,12 +28,18 @@
 			</form>
 		</div>
 		<div id="game" style="display: none;">
+			<div id="win" style="display: none;">
+				<h2 id="winner"></h2>
+				<form>
+					<input type="submit" value="New game" id="restart"/>
+				</form>
+			</div>
 			<h2>Current player: <span  id="next_player"></span></h2>
-			<h3>Score: </h3>
-			<p>
+			<div id="score_board">
+				<h3>Score: </h3>
 				<strong id="p1_name"></strong>: <span id="p1_score"></span>p<br/>
 				<strong id="p2_name"></strong>: <span id="p2_score"></span>p<br/>
-			</p>
+			</div>
 			<table id="board"/>
 		</div>
 	</body>
