@@ -1,0 +1,6 @@
+#!/bin/bash
+i=0
+for f in `ls unscaled/*`; do
+	convert "$f" -geometry 512x512 "scaled/$i.png"
+	i=$((i+1))
+done

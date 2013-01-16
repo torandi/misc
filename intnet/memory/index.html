@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="sv" lang="sv">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<title>Memory</title>
+		<script src="js/jquery.js" type="text/javascript"></script>
+		<script src="js/memory.js" type="text/javascript"></script>
+		<link type="text/css" rel="stylesheet" href="memory.css" />
+	</head>
+	<body>
+		<h1>Memory</h1>
+		<div id="newgame">
+			<h2>New game</h2>
+			<form>
+				<p>
+				<label for="p1">Player 1 name: </label><input type="text" id="p1" value="Player 1"/><br/>
+				<label for="p2">Player 2 name: </label><input type="text" id="p2" value="Player 2"/><br/>
+				<input type ="submit" value="Start game" id="start"/>
+				</p>
+			</form>
+		</div>
+		<div id="game" style="display: none;">
+			<h2 id="next_player">Current player: </h2>
+			<h3>Score: </h3>
+			<p>
+				<strong id="p1_name"></strong>: <span id="p1_score"></span><br/>
+				<strong id="p2_name"></strong>: <span id="p2_score"></span><br/>
+			</p>
+			<table id="board"/>
+		</div>
+	</body>
+</html>
+
