@@ -1,11 +1,17 @@
-var player1 = {
+var players = [
+	{
 	name: "Player1",
-	score: 0
-}
-var player2 = {
+	score: 0,
+	old_score: 0,
+	},
+	{
 	name: "Player2",
-	score: 0
-}
+	score: 0,
+	old_score: 0,
+	}
+]
+
+var current_player = 0;
 
 var set = null;
 var size = [0, 0];
@@ -19,15 +25,21 @@ var sets = {
 
 var board = null;
 
+var remaining_cards = 0;
+
 var unknown_path = null;
 var unknown_hover_path = null;
 
+var open_cards = []
+
 $(function() {
 	$("#start").click(function() {
-		player1.name = $("#p1").val();
-		player1.score = 0;
-		player2.name = $("#p2").val();
-		player2.score = 0;
+		players[0].name = $("#p1").val();
+		players[0].score = 0;
+		players[0].old_score = 0;
+		players[1].name = $("#p2").val();
+		players[1].score = 0;
+		players[1].old_score = 0;
 		$("#newgame").slideUp();
 		load_set(sets.landscapes, [4, 4]);
 		$("#game").slideDown();
@@ -42,15 +54,28 @@ function load_set(_set, _size) {
 	unknown_path = set.path + "unknown.png";
 	unknown_hover_path = set.path + "unknown_hover.png";
 
-	$("#p1_name").html(player1.name);
-	$("#p2_name").html(player2.name);
+	$("#p1_name").html(players[0].name);
+	$("#p2_name").html(players[1].name);
+
+	current_player = 0;
 	load_board();
+	update_turn();
 	update_score();
 }
 
 function update_score() {
-	$("#p1_score").html(player1.score);
-	$("#p2_score").html(player2.score);
+	for(i = 0; i<2; ++i) {
+		$("#p" + (i + 1 ) + "_score").html(players[i].score);
+		if(players[i].score != players[i].old_score) {
+			$("#p" + (i + 1 ) + "_score").flash()
+			players[i].old_score = players[i].score
+		}
+	}
+}
+
+function update_turn() {
+	$("#next_player").html(players[current_player].name);
+	$("#next_player").flash();
 }
 
 function load_board() {
@@ -83,6 +108,8 @@ function load_board() {
 		board[pos2] = new_card(card);
 		console.log("Card "+ card + " to " + pos1 + " and " + pos2);
 	}
+	
+	remaining_cards = positions/2;
 
 	//Generate html for board:
 	generate_board_html();
@@ -98,7 +125,8 @@ function new_card(card_id) {
 	return {
 		id: card_id,
 		path: set.path + card_id + ".png",
-		found: false
+		found: false,
+		visible: false
 	}
 }
 
@@ -109,9 +137,101 @@ function generate_board_html() {
 		for(x = 0; x < size[0]; ++x) {
 			var board_pos = y * size[0] + x;
 			var card = board[board_pos];
-			html += "<td class='cell' data-cell='" + x + "'> <img src='" + card.path + "' class='card' data-card='" + board_pos + "'/> </td>"
+			html += "<td class='cell' data-cell='" + x + "'> <div class='card' data-card='" + board_pos + "'> \
+				<img src='" + unknown_path + "' class='front'/> \
+				<img src='" + card.path + "' class='back'/> \
+			</td>"
 		}
 		html +="</tr>"
 	}
 	$("#board").html(html);
+	register_handlers();
+}
+
+$.fn.flip = function() {
+	this.each(function() {
+		var obj = $(this)
+		if(obj.hasClass("flipped")) {
+			obj.removeClass("flipped")
+		} else {
+			$(this).removeClass("peak");
+			$(this).children(".front").attr("src", unknown_path);
+			obj.addClass("flipped")
+		}
+	})
+}
+
+$.fn.flash = function() {
+	this.each(function() {
+		var obj = $(this)
+		obj.fadeOut(200).fadeIn(200)
+	})
+}
+
+function register_handlers() {
+	$(".card").hover(function() {
+		if(!$(this).hasClass("flipped")) {
+			$(this).children(".front").attr("src", unknown_hover_path);
+			$(this).addClass("peak");
+		}
+	}, function() {
+		if(!$(this).hasClass("flipped")) {
+			$(this).children(".front").attr("src", unknown_path);
+			$(this).removeClass("peak");
+		}
+	})
+
+	$(".card").click(function() {
+		toggle_card($(this));
+	})
+}
+
+function restore_open() {
+	$.each(open_cards, function(index, card) {
+		card.obj.flip()
+		board[card.id].visible = false
+	})
+	open_cards.length = 0
+}
+
+function toggle_card(card_holder) {
+	if(open_cards.length >= 2) return;
+	var board_pos = card_holder.data("card");
+	var card = board[board_pos];
+	if(!card.visible) {
+		var co = {
+			obj: card_holder,
+			id: board_pos
+		}
+		open_cards.push(co)
+		card.visible = true
+		card_holder.flip()
+	}
+	if(open_cards.length == 2) {
+		setTimeout(check_open, 900)
+	}
+}
+
+function check_open() {
+	var c1 = board[open_cards[0].id]
+	var c2 = board[open_cards[1].id]
+	if(c1.id == c2.id) {
+		open_cards[0].obj.flash()
+		open_cards[1].obj.flash()
+		++players[current_player].score
+		update_score()
+		c1.found = true
+		c2.found = true
+		open_cards.length = 0
+		current_player = (current_player + 1) % 2;
+		update_turn()
+	} else {
+		setTimeout(restore_and_next, 800)
+	}
+}
+
+function restore_and_next() {
+	restore_open()
+	current_player = (current_player + 1) % 2;
+	update_turn()
 }
