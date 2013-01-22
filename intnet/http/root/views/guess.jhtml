@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+	<meta charset="utf-8"/>
+	<title>Number Guess Game</title>
+
+	<link href="bootstrap.css" rel="stylesheet"/>
+	<script type="text/javascript">
+		function set_focus() {
+			document.getElementById("guess").focus();
+		}
+	</script>
+</head>
+
+<body onload="set_focus();">
+	<div style="margin: 10px">
+		<h1>Number guessing game</h1>
+		<?:message?>
+		<?:image?>
+
+		<?:form?>
+
+	</div>
+</body>
+</html>
+
+

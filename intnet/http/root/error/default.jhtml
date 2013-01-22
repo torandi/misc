@@ -1,0 +1,9 @@
+<html>
+<head>
+<title><?:code?> - <?:description?></title>
+</head>
+<body>
+<h1><?:code?> - <?:description?></h1>
+<p><?:message?></p>
+</body>
+</html>

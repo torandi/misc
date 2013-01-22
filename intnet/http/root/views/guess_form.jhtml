@@ -1,0 +1,5 @@
+	<form name="guess">
+		<label for="guess">Number: </label>
+		<input type="text" name="guess" id="guess"/><br/>
+		<input type="submit" value="Guess"/>
+	</form>
