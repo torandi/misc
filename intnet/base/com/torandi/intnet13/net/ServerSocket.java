@@ -25,7 +25,7 @@ public class ServerSocket extends java.net.ServerSocket{
 	}
 	
 	/**
-	 * Starts listening (non-blocking)
+	 * Starts listening 
 	 */
 	public void listen(final SocketListener listener, boolean blocking) {
 		if(listen != false) {
