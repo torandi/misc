@@ -417,7 +417,7 @@ public class WebServer implements SocketListener {
 					handle_request();
 				} else {
 					String split[] = data.split(":");
-					request_headers.put(split[0], split[1]);
+					request_headers.put(split[0], split[1].trim());
 				}
 			} else if(data.isEmpty()) {
 				reset_request();
@@ -437,6 +437,12 @@ public class WebServer implements SocketListener {
 		}
 		
 		private void handle_request() {
+			System.out.println(verb + " " + request_addr);
+			String connection = request_headers.get("Connection");
+			if(connection != null && connection.toLowerCase().equals("close")) {
+				keep_alive = false;
+			}
+			
 			//Parse cookies:
 			String cookie_string = request_headers.get("Cookie");
 			if(cookie_string != null) {

@@ -33,6 +33,7 @@ public class Default implements Page {
 		
 		if(guess_str != null) {
 			int guess = Integer.parseInt(guess_str);
+			++guesses;
 			if(guess == target) {
 				message = "<h2>Correct!!!</h2>";
 				message +="<p>Number of guesses: " + guesses + "</p>";
@@ -41,7 +42,6 @@ public class Default implements Page {
 				request.set_data("target", null);
 				request.set_data("guesses", "0");
 			} else {
-				++guesses;
 				request.set_data("guesses", "" + guesses);
 				if(guess < target) {
 					message = "<h2>Wrong! Guess higher.</h2>";
