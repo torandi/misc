@@ -468,16 +468,21 @@ public class WebServer implements SocketListener {
 			if(file.startsWith("/")) {
 				file = file.substring(1);
 			}
-			
-			if(file.isEmpty()) {
-				if(file_exists("Default.class")) {
-					file = "Default.class";
-				} else {
-					file = "index.html";
-				}
-			}
 		
 			File file_obj = new File(public_dir, file);
+			
+			if(file_obj.isDirectory()) {
+				if(!file.endsWith("/")) {
+					file += "/";
+				}
+				if(new File(file_obj,"Default.class").exists()) {
+					file_obj = new File(file_obj,"Default.class");
+					file += "Default.class";
+				} else {
+					file_obj = new File(file_obj,"index.html");
+					file += "index.html";
+				}
+			}
 			
 			try {
 				if(!file_exists(file)) {
