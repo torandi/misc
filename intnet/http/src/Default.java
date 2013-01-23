@@ -18,11 +18,15 @@ public class Default implements Page {
 		this.request = request;
 		String stored = request.get_data("target");
 		int target;
+		int guesses;
 		if(stored == null) {
 			target = new Random().nextInt(100) + 1;
+			guesses = 0;
 			request.set_data("target", ""+target);
+			request.set_data("guesses", "0");
 		} else {
 			target = Integer.parseInt(stored);
+			guesses = Integer.parseInt(request.get_data("guesses"));
 		}
 		
 		String guess_str = request.request("guess");
@@ -31,15 +35,20 @@ public class Default implements Page {
 			int guess = Integer.parseInt(guess_str);
 			if(guess == target) {
 				message = "<h2>Correct!!!</h2>";
+				message +="<p>Number of guesses: " + guesses + "</p>";
 				image = "<p><img src='correct.gif'/></p>";
 				form = "new_guess";
 				request.set_data("target", null);
+				request.set_data("guesses", "0");
 			} else {
+				++guesses;
+				request.set_data("guesses", "" + guesses);
 				if(guess < target) {
 					message = "<h2>Wrong! Guess higher.</h2>";
 				} else {
 					message = "<h2>Wrong! Guess lower.</h2>";
 				}
+				message +="<p>Number of guesses: " + guesses + "</p>";
 				image = "<p><img src='nope" + (new Random().nextInt(2) + 1) + ".jpg'/></p>";
 			}
 		} else {

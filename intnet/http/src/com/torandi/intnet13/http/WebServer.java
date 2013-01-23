@@ -465,10 +465,6 @@ public class WebServer implements SocketListener {
 			
 			String file = url.trim();
 			
-			if(file.startsWith("/")) {
-				file = file.substring(1);
-			}
-		
 			File file_obj = new File(public_dir, file);
 			
 			if(file_obj.isDirectory()) {
@@ -483,6 +479,11 @@ public class WebServer implements SocketListener {
 					file += "index.html";
 				}
 			}
+			
+			if(file.startsWith("/")) {
+				file = file.substring(1);
+			}
+		
 			
 			try {
 				if(!file_exists(file)) {
