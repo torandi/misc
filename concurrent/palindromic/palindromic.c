@@ -116,7 +116,7 @@ void load_wordlist() {
 
 	for(char* cur = word_data; cur < (word_data + size); ++cur) {
 		if(*cur == '\0') {
-			/* Push new word */
+			/* Create and push new word */
 			word_t w;
 			w.start = word;
 			w.length = (unsigned char) (cur - word);
@@ -142,6 +142,13 @@ word_t * next() {
 			break;
 		}
 		w = wordlist + (next_word++);
+		/* We don't lock the mutex for palindromic flag here.
+		 * The worst case is that it changes to true after we have read it,
+		 * so that we get a false positive, but that is caught in a critical section 
+		 * just before a potential write.
+		 *
+		 * The flag never changes from true to false, so we won't get any false negatives
+		 */
 	} while(w->palindromic && next_word < num_words);
 
 	pthread_mutex_unlock(&next_mutex);
@@ -193,6 +200,12 @@ int is_palindromic(word_t * w) {
 	if(match != NULL) {
 		int ret = 0;
 
+		/*
+		 * Lock mutex for setting palindromic flag since another thread may have
+		 * the word that this word is palindromic to.
+		 *
+		 * Having individual mutexes for all words is slower then having one global
+		 */
 		pthread_mutex_lock(&write_mutex);
 		
 		/* Make sure no other thread have claimed this palindromic */
