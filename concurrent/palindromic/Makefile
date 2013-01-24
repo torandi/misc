@@ -4,7 +4,8 @@ LDFLAGS=-pthread
 all: palindromic
 
 clean: 
-	rm palindromic
+	rm -f palindromic
+	rm -f *.o
 
 palindromic: palindromic.o timer.o
 
