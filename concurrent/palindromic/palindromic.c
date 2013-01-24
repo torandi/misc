@@ -75,6 +75,10 @@ int main(const int argc, const char ** argv) {
 	printf("Runtime: %fs\n", get_timer_result(&t));
 
 	free_wordlist();
+
+	pthread_mutex_destroy(&write_mutex);
+	pthread_mutex_destroy(&next_mutex);
+
 	return 0;
 }
 
