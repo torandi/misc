@@ -1,0 +1,13 @@
+A program that finds palindromic words in a word list.
+
+Build:
+make
+
+Usage:
+./palindromic num_workers
+
+num_workers: Number of worker threads, required
+
+Speedup with threading:
+Without any threading (and no threading overhead) the program ran for 0.0098s
+With 10 workers the program ran for 0.0046s yielding a speedup of 2.13
