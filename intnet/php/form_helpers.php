@@ -90,9 +90,9 @@ function range_select($form_name, $name, $label, $options) {
 		<div class='control-group'>
 			<label class='control-label' for='{$form_name}_$name'>$label</label>
 			<div class='controls'>
-			<select name='{$name}_min' class='min' id='{$form_name}_{$name}_min'>$option_html</select>
+			<select name='{$name}_min' class='input-mini min' style='text-align: right' id='{$form_name}_{$name}_min'>$option_html</select>
 			till
-			<select name='{$name}_max' class='max' id='{$form_name}_{$name}_max'>$option_html</select>
+			<select name='{$name}_max' class='input-mini max' style='text-align: right' id='{$form_name}_{$name}_max'>$option_html</select>
 			</div>
 		</div>
 	";

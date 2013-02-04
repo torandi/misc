@@ -14,20 +14,24 @@ $(function() {
 			data: $(this).serialize(),
 			success: function(data) {
 				$("#results").html(data);
+				$(".sortable thead tr th").removeClass("cur_sort")
+				$(".sortable thead tr th").removeClass("sort_asc")
+				$(".sortable thead tr th").removeClass("sort_desc")
+
+				cur_sort='pris';
+				sort_direction = 1;
+
+				$(".sortable thead tr th." + cur_sort).addClass("cur_sort")
+				$(".sortable thead tr th." + cur_sort).addClass("sort_asc")
 			}
 		})
 		return false;
 	})
 
   $(".sortable thead tr th").click(function() {
-    if(cur_sort!=null) {
-      $(".sortable thead tr th ."+cur_sort).removeClass("cur_sort")
-      if(sort_direction==1) {
-        $(".sortable thead tr th ."+cur_sort).removeClass("sort_asc")
-      } else {
-        $(".sortable thead tr th ."+cur_sort).removeClass("sort_desc")
-      }
-    }
+		$(".sortable thead tr th").removeClass("cur_sort")
+		$(".sortable thead tr th").removeClass("sort_asc")
+		$(".sortable thead tr th").removeClass("sort_desc")
 
     cur_class = $(this).attr('class')
     if(cur_sort == cur_class) {
@@ -47,11 +51,11 @@ $(function() {
     })
 
     //Decoration
-    $(".sortable thead tr th ."+cur_sort).addClass("cur_sort")
+    $(this).addClass("cur_sort")
     if(sort_direction == 1) {
-      $(".sortable thead tr th ."+cur_sort).addClass("sort_asc")
+      $(this).addClass("sort_asc")
     } else {
-      $(".sortable thead tr th ."+cur_sort).addClass("sort_desc")
+      $(this).addClass("sort_desc")
     }
   })
 })

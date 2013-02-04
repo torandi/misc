@@ -1,3 +1,15 @@
-.clear {
-	clear: both;
+.cur_sort {
+  text-decoration: underline;
+}
+
+.sort_asc {
+  background: url("arrow_down.png") no-repeat 100% 70%;
+}
+
+.sort_desc {
+  background: url("arrow_up.png") no-repeat 100% 70%;
+}
+
+.sortable thead tr th {
+	cursor: pointer;
 }

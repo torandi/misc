@@ -17,21 +17,26 @@ foreach($_GET as $field => $value) {
 			$field = substr($field, 0, -4);
 			$query .= "and $field <= ? ";
 			$param_types .= "i";
+		} else if(ends_with($field, "_like")) {
+			$field = substr($field, 0, -5);
+			$query .= "and lower($field) LIKE lower(?) ";
+			$value = "%$value%";
+			$param_types .= "s";
 		} else {
-			$query .= "and $field = ?";
+			$query .= "and $field = ? ";
 			$param_types .= "s";
 		}
 		$params[] = $value;
 	}
 }
 
-$query .= "order by pris desc";
+$query .= "order by pris asc";
 
 $stmt = $db->prepare($query);
 
 
 if($stmt === false) {
-	echo "<tr><td colspan='7'>Ett internt fel inträffade: {$stmt->error}</td></tr>";
+	echo "<tr><td colspan='7'>Ett internt fel inträffade: {$db->error}</td></tr>";
 	die();
 }
 

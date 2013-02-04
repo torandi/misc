@@ -27,6 +27,10 @@ include "../form_helpers.php";
 						<?=select("search", "lan", "Län", Bostad::available_lans())?>
 						<?=select("search", "objekttyp", "Objekttyp", Bostad::objekttyper())?>
 						<?=range_select("search", "rum", "Antal rum", Bostad::antal_rum())?>
+						<?=range_field("search", "area", "Boarea (m²)")?>
+						<?=range_field("search", "pris", "Pris")?>
+						<?=range_field("search", "avgift", "Avgift/hyra")?>
+						<?=field("search", "adress_like", "Adress", "text")?>
 						<input type="submit" class="btn btn-primary" value="Sök"/>
 					</form>
 				</div>
