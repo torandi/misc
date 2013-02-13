@@ -4,7 +4,6 @@
 #include <string.h>
 #include <math.h>
 #include <omp.h>
-#include "timer.h"
 
 #define WORDLIST_LOCATION "words"
 
@@ -25,8 +24,6 @@ char * word_data;
 unsigned int num_words;
 word_t * wordlist;
 
-timer t;
-
 void load_wordlist();
 void free_wordlist();
 void * worker(void * data);
@@ -41,7 +38,7 @@ int main(const int argc, const char ** argv) {
 
 	load_wordlist();
 
-	start_timer(&t);
+	double time = omp_get_wtime();
 
 	size_t num_palindromic = 0;
 
@@ -58,7 +55,7 @@ int main(const int argc, const char ** argv) {
 		}
 	}
 
-	stop_timer(&t);
+	time = omp_get_wtime() - time;
 
 	FILE * f = fopen("results", "w");
 
@@ -72,7 +69,7 @@ int main(const int argc, const char ** argv) {
 
 	printf("%zd palindromes found\n", num_palindromic);
 
-	printf("Runtime: %fs\n", get_timer_result(&t));
+	printf("Runtime: %fs\n", time);
 
 	free_wordlist();
 

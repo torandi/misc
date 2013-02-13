@@ -7,6 +7,6 @@ clean:
 	rm -f palindromic
 	rm -f *.o
 
-palindromic: palindromic.o timer.o
+palindromic: palindromic.o
 
 .PHONY: clean
