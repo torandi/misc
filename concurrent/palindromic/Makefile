@@ -1,5 +1,6 @@
 CFLAGS=-Wall -std=gnu99
 LDFLAGS=-pthread
+LDLIBS=-lm
 
 all: palindromic
 

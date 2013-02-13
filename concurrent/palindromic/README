@@ -10,4 +10,4 @@ num_workers: Number of worker threads, required
 
 Speedup with threading:
 Without any threading (and no threading overhead) the program ran for 0.0098s
-With 10 workers the program ran for 0.0046s yielding a speedup of 2.13
+With 8 workers (on a i7 with hyperthreading) the program ran for 0.0020 yielding a speedup of 4.9

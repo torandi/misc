@@ -3,9 +3,12 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <math.h>
 #include "timer.h"
 
 #define WORDLIST_LOCATION "words"
+
+#define MIN(X,Y) ((X) < (Y) ? (X) : (Y))
 
 typedef struct {
 	char* start;
@@ -13,16 +16,16 @@ typedef struct {
 	unsigned char palindromic;
 } word_t;
 
+typedef struct {
+	unsigned int start;
+	unsigned int end;
+} thread_data_t;
+
 char * word_data;
 unsigned int num_words;
 word_t * wordlist;
 
-unsigned int next_word = 0;
-
 timer t;
-
-pthread_mutex_t next_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t write_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void load_wordlist();
 void free_wordlist();
@@ -44,8 +47,17 @@ int main(const int argc, const char ** argv) {
 	pthread_t threads[num_workers];
 	size_t thread_found[num_workers];
 
+	unsigned int per_thread = (int)ceil((float)num_words / num_workers);
+
+	unsigned int next = 0;
+
+	thread_data_t td[num_workers];
+
 	for(int i = 0; i< num_workers; ++i) {
-		pthread_create(threads + i, NULL, worker, NULL);
+		td[i].start = next;
+		td[i].end = MIN(next + per_thread, num_words);
+		next += per_thread;
+		pthread_create(threads + i, NULL, worker, (void*)&(td[i]));
 	}
 
 	//Join threads:
@@ -75,9 +87,6 @@ int main(const int argc, const char ** argv) {
 	printf("Runtime: %fs\n", get_timer_result(&t));
 
 	free_wordlist();
-
-	pthread_mutex_destroy(&write_mutex);
-	pthread_mutex_destroy(&next_mutex);
 
 	return 0;
 }
@@ -132,30 +141,6 @@ void free_wordlist() {
 	free((void*)wordlist);
 }
 
-word_t * next() {
-	pthread_mutex_lock(&next_mutex);
-
-	word_t * w = NULL;
-	do {
-		if(next_word >= num_words) {
-			w = NULL;
-			break;
-		}
-		w = wordlist + (next_word++);
-		/* We don't lock the mutex for palindromic flag here.
-		 * The worst case is that it changes to true after we have read it,
-		 * so that we get a false positive, but that is caught in a critical section 
-		 * just before a potential write.
-		 *
-		 * The flag never changes from true to false, so we won't get any false negatives
-		 */
-	} while(w->palindromic && next_word < num_words);
-
-	pthread_mutex_unlock(&next_mutex);
-
-	return w;
-}
-
 word_t * binary_search(char * find) {
 	int start = 0;
 	int end = num_words - 1;
@@ -171,12 +156,14 @@ word_t * binary_search(char * find) {
 			start = pos + 1;
 		}
 	}
+	if(strcmp(find, wordlist[start].start) == 0) {
+		return wordlist + start;
+	}
 	return NULL;
 }
 
 /*
- * Tests if the given word is a palindrom, and if so modifies the palindromic flag
- * in this and the matched word
+ * Tests if the given word is a palindrom
  *
  * @returns the number of palindromes found 
  */
@@ -189,50 +176,29 @@ int is_palindromic(word_t * w) {
 	rev[w->length] = 0;
 
 	if(w->length == 1 || strcmp(w->start, rev) == 0) {
-		pthread_mutex_lock(&write_mutex);
 		w->palindromic = 1;
-		pthread_mutex_unlock(&write_mutex);
 		return 1;
 	}
 
 	word_t * match = binary_search(rev);
 
 	if(match != NULL) {
-		int ret = 0;
-
-		/*
-		 * Lock mutex for setting palindromic flag since another thread may have
-		 * the word that this word is palindromic to.
-		 *
-		 * Having individual mutexes for all words is slower then having one global
-		 */
-		pthread_mutex_lock(&write_mutex);
-		
-		/* Make sure no other thread have claimed this palindromic */
-
-		if(!w->palindromic) {
-			w->palindromic = 1;
-			match->palindromic = 1;
-			ret = 2;
-		} else {
-			ret = 0;
-		}
-
-		pthread_mutex_unlock(&write_mutex);
-		
-		return ret;
+		w->palindromic = 1;
+		return 1;
 	} else {
 		return 0;
 	}
 }
 
 void * worker(void * data) {
+	thread_data_t * td = (thread_data_t*) data;
 	size_t count = 0;
 
-	word_t * word = NULL;
+	word_t * w = NULL;
 
-	while( (word = next()) != NULL) {
-		count += is_palindromic(word);
+	for(unsigned int i = td->start; i < td->end; ++i) {
+		w = wordlist + i;
+		count += is_palindromic(w);
 	}
 
 	return (void*) count;
