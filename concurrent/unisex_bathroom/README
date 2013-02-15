@@ -1,0 +1,7 @@
+A simulation of a unisex bathroom in a workplace
+
+Build:
+make
+
+Usage:
+./bathroom num_persons_of_each_sex
