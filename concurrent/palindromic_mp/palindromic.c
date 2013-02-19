@@ -1,10 +1,9 @@
-#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
 #include <math.h>
-#include "timer.h"
+#include <omp.h>
 
 #define WORDLIST_LOCATION "words"
 
@@ -25,11 +24,10 @@ char * word_data;
 unsigned int num_words;
 word_t * wordlist;
 
-timer t;
-
 void load_wordlist();
 void free_wordlist();
 void * worker(void * data);
+int is_palindromic(word_t * w);
 
 int main(const int argc, const char ** argv) {
 	if(argc != 2) {
@@ -40,33 +38,24 @@ int main(const int argc, const char ** argv) {
 
 	load_wordlist();
 
-	start_timer(&t);
+	double time = omp_get_wtime();
 
 	size_t num_palindromic = 0;
 
-	pthread_t threads[num_workers];
-	size_t thread_found[num_workers];
+	omp_set_num_threads(num_workers);
 
-	unsigned int per_thread = (int)ceil((float)num_words / num_workers);
+	word_t * w = NULL;
 
-	unsigned int next = 0;
-
-	thread_data_t td[num_workers];
-
-	for(int i = 0; i< num_workers; ++i) {
-		td[i].start = next;
-		td[i].end = MIN(next + per_thread, num_words);
-		next += per_thread;
-		pthread_create(threads + i, NULL, worker, (void*)&(td[i]));
+#pragma omp parallel private(w)
+	{
+#pragma omp for reduction(+: num_palindromic) schedule(guided, 50) 
+		for(unsigned int i = 0; i < num_words; ++i) {
+			w = wordlist + i;
+			num_palindromic += is_palindromic(w);
+		}
 	}
 
-	//Join threads:
-	for(int i = 0; i< num_workers; ++i) {
-		pthread_join(threads[i], (void**)&(thread_found[i]));
-		num_palindromic += thread_found[i];
-	}	
-
-	stop_timer(&t);
+	time = omp_get_wtime() - time;
 
 	FILE * f = fopen("results", "w");
 
@@ -78,13 +67,9 @@ int main(const int argc, const char ** argv) {
 
 	fclose(f);
 
-	for(int i = 0; i< num_workers; ++i) {
-		printf("Thread %d found %zd palindromes\n", (i+1), thread_found[i]);
-	}
-
 	printf("%zd palindromes found\n", num_palindromic);
 
-	printf("Runtime: %fs\n", get_timer_result(&t));
+	printf("Runtime: %fs\n", time);
 
 	free_wordlist();
 
@@ -188,18 +173,4 @@ int is_palindromic(word_t * w) {
 	} else {
 		return 0;
 	}
-}
-
-void * worker(void * data) {
-	thread_data_t * td = (thread_data_t*) data;
-	size_t count = 0;
-
-	word_t * w = NULL;
-
-	for(unsigned int i = td->start; i < td->end; ++i) {
-		w = wordlist + i;
-		count += is_palindromic(w);
-	}
-
-	return (void*) count;
 }

@@ -2,12 +2,12 @@ CFLAGS=-Wall -std=gnu99
 LDFLAGS=-pthread
 LDLIBS=-lm
 
-all: palindromic
+all: bathroom
 
 clean: 
-	rm -f palindromic
+	rm -f bathroom
 	rm -f *.o
 
-palindromic: palindromic.o timer.o
+bathroom: bathroom.o
 
 .PHONY: clean
